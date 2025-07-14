@@ -1,15 +1,26 @@
 <script setup lang="ts" vapor>
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
+import BChatRenderer from '@/components/BChatRenderer.vue'
 
-const count = ref(0)
+let idx = 0
+const bchat = useTemplateRef('bchat')
 
 function add() {
-  count.value++
+  bchat.value?.pushBuffer({
+    id: `${idx++}`,
+    text: 'hello world',
+  })
 }
+
+setInterval(() => add(), 200)
 </script>
 
 <template>
-  <button @click="add">
-    {{ count }}
-  </button>
+  <BChatRenderer id="id" ref="bchat">
+    <template #default="{ item }">
+      <div>
+        {{ item }}
+      </div>
+    </template>
+  </BChatRenderer>
 </template>
