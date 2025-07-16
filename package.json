@@ -9,12 +9,14 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build",
+    "type-check": "tsmc --noEmit",
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@ts-macro/tsc": "^0.2.5",
     "pinia": "^3.0.3",
-    "vue": "^3.6.0-alpha.1"
+    "vue": "^3.6.0-alpha.1",
+    "vue-jsx-vapor": "^2.5.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.16.2",
@@ -33,7 +35,6 @@
     "npm-run-all2": "^8.0.4",
     "typescript": "~5.8.3",
     "vite": "^7.0.4",
-    "vite-plugin-vue-devtools": "^7.7.7",
     "vitest": "^3.2.4",
     "vue-tsc": "^3.0.1"
   }
