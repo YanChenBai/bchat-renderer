@@ -14,7 +14,9 @@
     "taze": "taze major -wir"
   },
   "dependencies": {
+    "@byc/unocss-preset": "^0.0.1",
     "@ts-macro/tsc": "^0.2.7",
+    "@unocss/reset": "^66.3.3",
     "pinia": "^3.0.3",
     "vue": "^3.6.0-alpha.2",
     "vue-jsx-vapor": "^2.5.2"
@@ -33,6 +35,7 @@
     "simple-git-hooks": "^2.13.0",
     "taze": "^19.1.0",
     "typescript": "~5.8.3",
+    "unocss": "^66.3.3",
     "vite": "^7.0.5",
     "vite-plugin-vue-devtools": "^7.7.7",
     "vitest": "^3.2.4",
