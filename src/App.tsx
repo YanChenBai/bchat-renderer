@@ -1,26 +1,27 @@
-import {
-  computed,
-  defineComponent,
-  defineVaporComponent,
-  ref,
-} from 'vue'
-import { useRef } from 'vue-jsx-vapor'
+import { defineComponent } from 'vue'
 
-const Comp = defineVaporComponent(({ count = 0 }) => {
-  defineExpose({
-    double: computed(() => count * 2),
-  })
-  return <span> x 2 = </span>
+const Comp = defineComponent(() => {
+  const slots = defineSlots<{
+    default: (props: { val: number }) => any
+  }>()
+
+  const Item = slots.default
+
+  if (!Item) throw new Error('no default slot')
+
+  return () => (
+    <div>
+      <div v-for={val in 20}>
+        <Item val={val} />
+      </div>
+    </div>
+  )
 })
 
 export default defineComponent(() => {
-  const count = ref(1)
-  const compRef = useRef()
   return () => (
-    <>
-      <input v-model={count.value} />
-      <Comp count={count.value} ref={compRef}></Comp>
-      {compRef.value?.double}
-    </>
+    <Comp v-slot={{ val }}>
+      <div>{val}</div>
+    </Comp>
   )
 })
