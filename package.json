@@ -10,13 +10,16 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "tsmc --noEmit",
-    "lint": "biome check --write",
+    "lint": "biome check --write --unsafe",
     "taze": "taze major -wir"
   },
   "dependencies": {
     "@byc/unocss-preset": "^0.0.1",
+    "@byc/volt": "^0.0.4",
     "@ts-macro/tsc": "^0.2.7",
     "@unocss/reset": "^66.3.3",
+    "@vueuse/core": "^13.5.0",
+    "nanoevents": "^9.1.0",
     "pinia": "^3.0.3",
     "vue": "^3.6.0-alpha.2",
     "vue-jsx-vapor": "^2.5.2"
@@ -36,6 +39,7 @@
     "taze": "^19.1.0",
     "typescript": "~5.8.3",
     "unocss": "^66.3.3",
+    "unplugin-auto-import": "^19.3.0",
     "vite": "^7.0.5",
     "vite-plugin-vue-devtools": "^7.7.7",
     "vitest": "^3.2.4",

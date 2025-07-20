@@ -1,5 +1,6 @@
-import { createApp, vaporInteropPlugin } from 'vue'
-import App from './App.tsx'
+import { createVaporApp } from 'vue'
+import App from './app.tsx'
 import 'virtual:uno.css'
+import './assets/main.css'
 
-createApp(App).use(vaporInteropPlugin).mount('#app')
+createVaporApp(App).mount('#app')
