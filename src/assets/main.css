@@ -5,17 +5,18 @@
 
 body {
   font-family: '华文宋体 Black';
+  background: #000;
 }
 
 .bchat-item {
   width: 100%;
-  animation: 0.6s linear enter-anim;
+  animation: 0.4s linear enter-anim;
 }
 
 @keyframes enter-anim {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(10px);
   }
 
   to {

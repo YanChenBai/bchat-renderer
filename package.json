@@ -10,7 +10,7 @@
     "test:unit": "vitest",
     "build-only": "vite build",
     "type-check": "tsmc --noEmit",
-    "lint": "biome check --write --unsafe",
+    "lint": "biome check --write --safe",
     "taze": "taze major -wir"
   },
   "dependencies": {

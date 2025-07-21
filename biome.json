@@ -31,10 +31,12 @@
         "noExplicitAny": "off"
       },
       "complexity": {
-        "noUselessEmptyExport": "off"
+        "noUselessEmptyExport": "off",
+        "noCommaOperator": "off"
       },
       "a11y": {
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off"
       }
     }
   },

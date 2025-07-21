@@ -144,12 +144,14 @@ export default () => {
     useMockData(HuiXingMockData)
 
   setTimeout(() => {
-    // bcl.handleGift(getGift())
     bcl.handleDanmaku(danmaku[0])
     bcl.handleDanmaku(danmaku[1])
     bcl.handleDanmaku(danmaku[2])
     bcl.handleDanmaku(danmaku[3])
+    // bcl.handleGift(getGift())
     // bcl.handleSuperChat(getSuperChat())
+    // bcl.handleGuard(getGuard())
+    bcl.handleDanmaku(getDanmaku())
   }, 10)
 
   return (
