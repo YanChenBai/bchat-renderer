@@ -1,6 +1,6 @@
 import type { HxDM, HxGift, HxGuard, HxSuperChat } from '@/types/huixing'
 
-const danmaku: HxDM[] = [
+export const danmaku: HxDM[] = [
   {
     id: '25',
     type: 'message',
@@ -13,7 +13,7 @@ const danmaku: HxDM[] = [
     fansMedalLevel: 76,
     guardLevel: 3,
     isAnchor: false,
-    isModerator: false,
+    isModerator: true,
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
@@ -29,7 +29,7 @@ const danmaku: HxDM[] = [
     fansMedalWearingStatus: false,
     fansMedalName: '^-^',
     fansMedalLevel: 16,
-    guardLevel: 0,
+    guardLevel: 2,
     isAnchor: false,
     isModerator: false,
     platform: 'bili',
@@ -47,7 +47,7 @@ const danmaku: HxDM[] = [
     fansMedalWearingStatus: false,
     fansMedalName: '',
     fansMedalLevel: 99,
-    guardLevel: 3,
+    guardLevel: 1,
     isAnchor: false,
     isModerator: false,
     platform: 'bili',

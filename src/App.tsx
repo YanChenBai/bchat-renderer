@@ -1,6 +1,6 @@
 import { BChatItem } from './components/BChatItem'
 import { useMockData } from './mock'
-import { HuiXingMockData } from './mock/huixing'
+import { danmaku, HuiXingMockData } from './mock/huixing'
 import { type AllEvent, HuiXingBChatListener } from './utils/bchat-adapter'
 
 const toFixed = (num: number, length: number) => Number(num.toFixed(length))
@@ -140,12 +140,20 @@ export default () => {
   bcl.emitter.on('enter', (data) => bchat.value?.add(data))
   bcl.emitter.on('like', (data) => bchat.value?.add(data))
 
-  const { getGift } = useMockData(HuiXingMockData)
+  const { getGift, getDanmaku, getGuard, getSuperChat } =
+    useMockData(HuiXingMockData)
 
-  setTimeout(() => bcl.handleGift(getGift()), 10)
+  setTimeout(() => {
+    // bcl.handleGift(getGift())
+    bcl.handleDanmaku(danmaku[0])
+    bcl.handleDanmaku(danmaku[1])
+    bcl.handleDanmaku(danmaku[2])
+    bcl.handleDanmaku(danmaku[3])
+    // bcl.handleSuperChat(getSuperChat())
+  }, 10)
 
   return (
-    <div class="h-600px">
+    <div class="h-600px w-590px">
       <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
         <BChatItem data={item} />
       </BChatRenderer>

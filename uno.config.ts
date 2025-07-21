@@ -1,27 +1,30 @@
 import { presetByc } from '@byc/unocss-preset'
-import { defineConfig } from 'unocss'
+import { defineConfig, toEscapedSelector as e } from 'unocss'
 
 export default defineConfig({
   presets: [presetByc()],
   rules: [
+    [/^bg-y-(.+)$/, ([, c]) => ({ 'background-position-y': `${c}` })],
     [
-      /^text-shadow-(\d+)-(.*)$/,
-      ([, d, c]) => ({
-        'text-shadow': `${d}px 0 ${c},
-      -${d}px 0 ${c},
-      0 ${d}px ${c},
-      0 -${d}px ${c},
-      ${d}px ${d}px ${c},
-      -${d}px -${d}px ${c},
-      ${d}px -${d}px ${c},
-      -${d}px ${d}px ${c}`,
-      }),
-    ],
-    [
-      /^text-stroke-(\d+)-(.*)$/,
-      ([, d, c]) => ({
-        '-webkit-text-stroke': `${d}px ${c}`,
-      }),
+      /^text-stroke-(.+)-(\d+)$/,
+      ([, color, width], { rawSelector }) => {
+        const selector = e(rawSelector)
+        return `
+${selector} {
+  position: relative;
+  z-index: 1;
+}
+${selector}::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  -webkit-text-stroke: ${width}px ${color};
+  color: transparent;
+  z-index: -1;
+}
+`
+      },
     ],
   ],
 })

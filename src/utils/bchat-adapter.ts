@@ -141,7 +141,7 @@ export interface SuperChat {
 
 export interface Guard {
   /** 消息类型  */
-  type: 'grand'
+  type: 'guard'
 
   /** 消息 ID */
   id: string
@@ -361,7 +361,7 @@ export class HuiXingBChatEventAdapter extends BChatEventAdapter {
   guard(data: HxEventMap['guard']): Guard {
     return {
       id: data.id,
-      type: 'grand',
+      type: 'guard',
       uid: data.uid,
       uname: data.uname,
       face: data.face,

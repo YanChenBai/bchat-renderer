@@ -2,3 +2,24 @@
   padding: 0;
   margin: 0;
 }
+
+body {
+  font-family: '华文宋体 Black';
+}
+
+.bchat-item {
+  width: 100%;
+  animation: 0.6s linear enter-anim;
+}
+
+@keyframes enter-anim {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
