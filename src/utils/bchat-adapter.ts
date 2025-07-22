@@ -1,4 +1,4 @@
-import { createNanoEvents } from 'nanoevents'
+import { Volt } from '@byc/volt'
 import { HxCmd, type HxEventMap } from '@/types/huixing'
 
 export interface Danmaku {
@@ -261,16 +261,16 @@ export abstract class BChatEventAdapter {
 export type AllEvent = Danmaku | Gift | SuperChat | Guard | Enter | Like
 
 interface EventMap {
-  dm: (data: Danmaku) => void
-  gift: (data: Gift) => void
-  superChat: (data: SuperChat) => void
-  guard: (data: Guard) => void
-  enter: (data: Enter) => void
-  like: (data: Like) => void
+  dm: Danmaku
+  gift: Gift
+  superChat: SuperChat
+  guard: Guard
+  enter: Enter
+  like: Like
 }
 
 class BChatListener {
-  emitter = createNanoEvents<EventMap>()
+  emitter = new Volt<EventMap>()
   constructor(private readonly chatAdapter: BChatEventAdapter) {}
 
   handleDanmaku(data: any) {

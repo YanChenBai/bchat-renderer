@@ -17,7 +17,8 @@ export const danmaku: HxDM[] = [
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
-    message: '点歌姬卡顿-管理员权限启动直播姬或obs',
+    message:
+      '点歌姬卡顿-管理员权限启动直播姬或obs, 点歌姬卡顿-管理员权限启动直播姬或obs',
   },
   {
     id: '26',
@@ -35,7 +36,7 @@ export const danmaku: HxDM[] = [
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
-    message: '彗星号产品交流群829107526',
+    message: '彗星号产品交流群829107526彗星号产品交流群829107526',
   },
   {
     id: '27',
@@ -71,7 +72,8 @@ export const danmaku: HxDM[] = [
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
-    message: '点歌主播听不见观众能听见请在浏览器源开启监听',
+    message:
+      '点歌主播听不见观众能听见请在浏览器源开启监听, 点歌主播听不见观众能听见请在浏览器源开启监听',
   },
   {
     id: '51',
@@ -91,9 +93,28 @@ export const danmaku: HxDM[] = [
     emojiImgUrl: '',
     message: '突然用不了或没反应请刷新当前浏览器缓存或删除浏览器重新添加',
   },
+  {
+    id: '69',
+    type: 'message',
+    uid: '80701739879506898',
+    uname: '炎天yawntee',
+    face: 'https://i1.hdslb.com/bfs/face/980f1ecf5fe286b2d563d5c4892478d1d9a87564.jpg',
+    timestamp: 1753027593,
+    fansMedalWearingStatus: false,
+    fansMedalName: '杰哥不要',
+    fansMedalLevel: 27,
+    guardLevel: 0,
+    isAnchor: false,
+    isModerator: false,
+    platform: 'bili',
+    dmType: 1,
+    emojiImgUrl:
+      'https://i0.hdslb.com/bfs/garb/b390776f760f1374ca53d0344d61ab0fb3d9f2a8.png',
+    message: '[emoji]',
+  },
 ]
 
-const guard: HxGuard[] = [
+export const guard: HxGuard[] = [
   {
     id: '72',
     type: 'guard',
@@ -150,7 +171,7 @@ const guard: HxGuard[] = [
   },
 ]
 
-const gift: HxGift[] = [
+export const gift: HxGift[] = [
   {
     id: '76',
     type: 'gift',
@@ -269,7 +290,7 @@ const gift: HxGift[] = [
   },
 ]
 
-const superChat: HxSuperChat[] = [
+export const superChat: HxSuperChat[] = [
   {
     id: '84',
     type: 'superChat',

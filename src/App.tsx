@@ -1,10 +1,13 @@
 import { BChatItem } from './components/BChatItem'
-import { useMockData } from './mock'
-import { danmaku, HuiXingMockData } from './mock/huixing'
-import { type AllEvent, HuiXingBChatListener } from './utils/bchat-adapter'
+import { danmaku, gift, guard, superChat } from './mock/huixing'
+import {
+  HuiXingBChatEventAdapter,
+  HuiXingBChatListener,
+} from './utils/bchat-adapter'
 
 const toFixed = (num: number, length: number) => Number(num.toFixed(length))
 
+// biome-ignore lint/correctness/noUnusedVariables: <>
 const BChatRenderer = <T extends Record<string, any> = []>({
   idKey = 'id',
 }: {
@@ -132,16 +135,12 @@ export default () => {
   const bchat = useRef()
 
   const bcl = new HuiXingBChatListener()
+  const adapter = new HuiXingBChatEventAdapter()
 
-  bcl.emitter.on('dm', (data) => bchat.value?.add(data))
-  bcl.emitter.on('gift', (data) => bchat.value?.add(data))
-  bcl.emitter.on('superChat', (data) => bchat.value?.add(data))
-  bcl.emitter.on('guard', (data) => bchat.value?.add(data))
-  bcl.emitter.on('enter', (data) => bchat.value?.add(data))
-  bcl.emitter.on('like', (data) => bchat.value?.add(data))
-
-  const { getGift, getDanmaku, getGuard, getSuperChat } =
-    useMockData(HuiXingMockData)
+  bcl.emitter.batchSubscribe(
+    ['dm', 'gift', 'superChat', 'guard', 'enter', 'like'],
+    (data) => bchat.value?.add(data),
+  )
 
   setTimeout(() => {
     bcl.handleDanmaku(danmaku[0])
@@ -151,14 +150,23 @@ export default () => {
     // bcl.handleGift(getGift())
     // bcl.handleSuperChat(getSuperChat())
     // bcl.handleGuard(getGuard())
-    bcl.handleDanmaku(getDanmaku())
+    // bcl.handleDanmaku(getDanmaku())
   }, 10)
 
   return (
-    <div class="h-600px w-590px">
-      <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
+    <div class="w-590px">
+      {/* <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
         <BChatItem data={item} />
-      </BChatRenderer>
+      </BChatRenderer> */}
+
+      <BChatItem data={adapter.danmaku(danmaku[0])} />
+      <BChatItem data={adapter.danmaku(danmaku[1])} />
+      <BChatItem data={adapter.danmaku(danmaku[2])} />
+      <BChatItem data={adapter.danmaku(danmaku[3])} />
+      <BChatItem data={adapter.danmaku(danmaku[5])} />
+      <BChatItem data={adapter.guard(guard[0])} />
+      <BChatItem data={adapter.gift(gift[0])} />
+      <BChatItem data={adapter.superChat(superChat[0])} />
     </div>
   )
 }
