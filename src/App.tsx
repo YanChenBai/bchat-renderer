@@ -1,10 +1,5 @@
 import { BChatItem } from './components/BChatItem'
-// import { danmaku, gift, guard, superChat } from './mock/huixing'
-import {
-  type AllEvent,
-  // HuiXingBChatEventAdapter,
-  HuiXingBChatListener,
-} from './utils/bchat-adapter'
+import { type AllEvent, HuiXingBChatListener } from './utils/bchat-adapter'
 
 const toFixed = (num: number, length: number) => Number(num.toFixed(length))
 
@@ -143,30 +138,17 @@ export default () => {
   const bchat = useRef()
 
   const bcl = new HuiXingBChatListener()
-  // const adapter = new HuiXingBChatEventAdapter()
 
   bcl.emitter.batchSubscribe(
     ['dm', 'gift', 'superChat', 'guard', 'enter', 'like'],
     (_, data) => bchat.value?.add(data),
   )
 
-  // setInterval(() => {
-  //   bcl.handleDanmaku(danmaku[Math.floor(Math.random() * danmaku.length)])
-  // }, 500)
-
   return (
     <div class="w-590px h-screen overflow-hidden">
       <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
         <BChatItem data={item} />
       </BChatRenderer>
-      {/* <BChatItem data={adapter.danmaku(danmaku[0])} />
-      <BChatItem data={adapter.danmaku(danmaku[1])} />
-      <BChatItem data={adapter.danmaku(danmaku[2])} />
-      <BChatItem data={adapter.danmaku(danmaku[3])} />
-      <BChatItem data={adapter.danmaku(danmaku[5])} />
-      <BChatItem data={adapter.guard(guard[0])} />
-      <BChatItem data={adapter.gift(gift[0])} />
-      <BChatItem data={adapter.superChat(superChat[0])} /> */}
     </div>
   )
 }
