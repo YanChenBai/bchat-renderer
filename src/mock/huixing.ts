@@ -36,7 +36,7 @@ export const danmaku: HxDM[] = [
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
-    message: '彗星号产品交流群829107526彗星号产品交流群829107526',
+    message: '彗星号产品交流群829107526彗星号产品交流群829107526'.repeat(2),
   },
   {
     id: '27',
@@ -54,7 +54,7 @@ export const danmaku: HxDM[] = [
     platform: 'bili',
     dmType: 0,
     emojiImgUrl: '',
-    message: '您的赞助是我们持续更新的动力',
+    message: '您'.repeat(10),
   },
   {
     id: '28',
