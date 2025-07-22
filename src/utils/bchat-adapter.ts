@@ -416,8 +416,6 @@ export class HuiXingBChatListener extends BChatListener {
 
     //监听事件
     window.addEventListener('message', (event) => {
-      console.log(event.data)
-
       if (event.data.category === 'event') {
         const {
           category,
@@ -453,10 +451,10 @@ export class HuiXingBChatListener extends BChatListener {
       // 监听配置变化
       if (event.data.category === 'update' && event.data.type === 'option') {
         const {
-          args: [option],
+          args: [_option],
         } = event.data
 
-        console.log(option)
+        // console.log(option)
       }
     })
 

@@ -1,13 +1,13 @@
 import { BChatItem } from './components/BChatItem'
-import { danmaku, gift, guard, superChat } from './mock/huixing'
+// import { danmaku, gift, guard, superChat } from './mock/huixing'
 import {
-  HuiXingBChatEventAdapter,
+  type AllEvent,
+  // HuiXingBChatEventAdapter,
   HuiXingBChatListener,
 } from './utils/bchat-adapter'
 
 const toFixed = (num: number, length: number) => Number(num.toFixed(length))
 
-// biome-ignore lint/correctness/noUnusedVariables: <>
 const BChatRenderer = <T extends Record<string, any> = []>({
   idKey = 'id',
 }: {
@@ -34,32 +34,34 @@ const BChatRenderer = <T extends Record<string, any> = []>({
   let speed = 0
   let targetSpeed = 0
 
-  function loopMoveBuffer() {
-    const item = buffer.shift()
+  let frameCount = 0
+  let containerHeight = 0
+  const RECYCLE_INTERVAL = 30
 
-    if (item) {
-      renderQueue.value.push(item)
+  function loopMoveBuffer() {
+    if (buffer.length > 0) {
+      const count = Math.min(2, buffer.length) // 每次最多取 2 条
+      renderQueue.value.push(...buffer.splice(0, count))
     }
 
-    setTimeout(loopMoveBuffer, 100)
+    setTimeout(loopMoveBuffer, 200)
   }
 
   const add = (item: T) => buffer.push(item)
 
   const updateTargetSpeed = () => {
-    targetSpeed = toFixed(Math.max(1, renderQueue.value.length * 0.4), 2)
+    targetSpeed = toFixed(Math.max(1, renderQueue.value.length * 0.6), 2)
   }
 
   async function tick() {
     const next = () => requestAnimationFrame(tick)
 
-    const containerEl = bchatWrap.value
+    frameCount++
     const contentEl = bchatContent.value
 
-    if (!containerEl || !contentEl) return next()
+    if (!contentEl) return next()
 
     const contentHeight = contentEl.clientHeight
-    const containerHeight = containerEl.clientHeight
 
     const scrollVal = Math.max(0, contentHeight - containerHeight)
 
@@ -68,12 +70,14 @@ const BChatRenderer = <T extends Record<string, any> = []>({
      * 应为一旦超出就会被回收
      */
     const isOverflow =
-      offset.value <= 0 ? false : offset.value / containerHeight > 1
+      offset.value <= 0 ? false : offset.value / containerHeight > 1.5
 
-    if (isOverflow) {
+    if (isOverflow && frameCount % RECYCLE_INTERVAL === 0) {
       const items = contentEl.querySelectorAll<HTMLDivElement>(
         `.${BCHAT_ITEM_CLASS}`,
       )
+
+      frameCount = 0
 
       let heightTotal = 0
       let removedTotal = 0
@@ -89,16 +93,16 @@ const BChatRenderer = <T extends Record<string, any> = []>({
 
       if (removedTotal <= 0) return next()
 
-      await nextTick()
+      // await nextTick()
       renderQueue.value.splice(0, removedTotal)
-      await nextTick()
+      // await nextTick()
       offset.value -= heightTotal
     } else {
       speed = Math.min(speed + (targetSpeed - speed) * 0.1, targetSpeed)
+      // speed = targetSpeed
 
       offset.value = Math.min(scrollVal, offset.value + speed)
     }
-
     next()
   }
 
@@ -106,6 +110,7 @@ const BChatRenderer = <T extends Record<string, any> = []>({
 
   onMounted(() => {
     loopMoveBuffer()
+    containerHeight = bchatWrap.value?.clientHeight ?? 0
     tick()
   })
 
@@ -117,7 +122,10 @@ const BChatRenderer = <T extends Record<string, any> = []>({
     <div class="size-full overflow-hidden" ref={bchatWrap}>
       <div
         ref={bchatContent}
-        style={{ transform: `translate3d(0, -${offset.value}px, 0)` }}
+        style={{
+          transform: `translate3d(0, -${offset.value}px, 0)`,
+          willChange: 'transform',
+        }}
       >
         <div
           v-for={item in renderQueue.value}
@@ -135,38 +143,30 @@ export default () => {
   const bchat = useRef()
 
   const bcl = new HuiXingBChatListener()
-  const adapter = new HuiXingBChatEventAdapter()
+  // const adapter = new HuiXingBChatEventAdapter()
 
   bcl.emitter.batchSubscribe(
     ['dm', 'gift', 'superChat', 'guard', 'enter', 'like'],
-    (data) => bchat.value?.add(data),
+    (_, data) => bchat.value?.add(data),
   )
 
-  setTimeout(() => {
-    bcl.handleDanmaku(danmaku[0])
-    bcl.handleDanmaku(danmaku[1])
-    bcl.handleDanmaku(danmaku[2])
-    bcl.handleDanmaku(danmaku[3])
-    // bcl.handleGift(getGift())
-    // bcl.handleSuperChat(getSuperChat())
-    // bcl.handleGuard(getGuard())
-    // bcl.handleDanmaku(getDanmaku())
-  }, 10)
+  // setInterval(() => {
+  //   bcl.handleDanmaku(danmaku[Math.floor(Math.random() * danmaku.length)])
+  // }, 500)
 
   return (
-    <div class="w-590px">
-      {/* <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
+    <div class="w-590px h-screen overflow-hidden">
+      <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
         <BChatItem data={item} />
-      </BChatRenderer> */}
-
-      <BChatItem data={adapter.danmaku(danmaku[0])} />
+      </BChatRenderer>
+      {/* <BChatItem data={adapter.danmaku(danmaku[0])} />
       <BChatItem data={adapter.danmaku(danmaku[1])} />
       <BChatItem data={adapter.danmaku(danmaku[2])} />
       <BChatItem data={adapter.danmaku(danmaku[3])} />
       <BChatItem data={adapter.danmaku(danmaku[5])} />
       <BChatItem data={adapter.guard(guard[0])} />
       <BChatItem data={adapter.gift(gift[0])} />
-      <BChatItem data={adapter.superChat(superChat[0])} />
+      <BChatItem data={adapter.superChat(superChat[0])} /> */}
     </div>
   )
 }

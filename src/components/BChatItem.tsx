@@ -17,18 +17,15 @@ import GiftFrameFlower from '@/assets/chat-ui/gift-frame-flower.png'
 import GuardBg from '@/assets/chat-ui/grand.png'
 import GuardBow from '@/assets/chat-ui/guard-bow.png'
 import GuardBowBead from '@/assets/chat-ui/guard-bow-bead.png'
-import GuardDmBg from '@/assets/chat-ui/guard-dm-bg.svg'
 import GuardDmFaceFrame from '@/assets/chat-ui/guard-dm-face-frame.png'
 import GuardLeftBottomStart from '@/assets/chat-ui/guard-left-bottom-star.png'
 import GuardLeftTopFlower from '@/assets/chat-ui/guard-left-top-flower.png'
 import GuardMidFlower from '@/assets/chat-ui/guard-mid-flower.png'
 import GuardRightBottomFlower from '@/assets/chat-ui/guard-right-bottom-flower.png'
 import ModeratorBow from '@/assets/chat-ui/moderator-bow.png'
-import ModeratorDmBg from '@/assets/chat-ui/moderator-dm-bg.svg'
 import ModeratorDmFaceFrame from '@/assets/chat-ui/moderator-dm-face-frame.png'
 import ModeratorLeftFlower from '@/assets/chat-ui/moderator-left-flower.png'
 import ModeratorRightFlower from '@/assets/chat-ui/moderator-right-flower.png'
-import NormalDmBg from '@/assets/chat-ui/normal-dm-bg.svg'
 import ScBg from '@/assets/chat-ui/sc-bg.png'
 import ScFrameFlower from '@/assets/chat-ui/sc-frame-flower.png'
 
@@ -57,7 +54,7 @@ export const RenderText = ({ text }: { text: string; class?: string }) => {
   )
 }
 
-export const DanmakuContentRender = ({ data }: { data: Danmaku }) => {
+export const DanmakuMessageRender = ({ data }: { data: Danmaku }) => {
   const slots = defineSlots({
     default: (props: { data: Danmaku }) => (
       <RenderText text={props.data.message} />
@@ -67,12 +64,168 @@ export const DanmakuContentRender = ({ data }: { data: Danmaku }) => {
   if (data.dmType === 1) {
     return (
       <div class="size-full flex justify-center items-center">
-        <img src={data.emojiUrl} class="w-50px text-center" />
+        <img src={data.emojiUrl} class="w-45px text-center" />
       </div>
     )
   } else {
     return <slots.default data={data} />
   }
+}
+
+interface BChatBgProps {
+  bgColor: [string, string]
+  borderColor: string
+  borderPaddingY?: number
+  borderPaddingX?: number
+  insideBorder?: boolean
+  fixSize?: number
+  cornerHeight?: number
+  cornerWidth?: number
+  class?: string
+  minHeight?: number
+  contentClass?: string
+  bgPoint?: boolean
+  bg: {
+    lt: string
+    lb: string
+    rt: string
+    rb: string
+  }
+}
+
+const BChatBubble = ({
+  bgColor,
+  borderColor,
+  borderPaddingY = 9,
+  borderPaddingX = 8,
+  insideBorder = true,
+  fixSize = 2,
+  cornerHeight = 39,
+  cornerWidth = 29,
+  minHeight = 78,
+  bg,
+  contentClass,
+  bgPoint = true,
+}: BChatBgProps) => {
+  const slots = defineSlots({
+    /** zIndex-4 */
+    overlay: () => <div />,
+
+    /** zIndex-3 */
+    default: () => <div />,
+
+    /** zIndex-2 */
+    decorator: () => <div />,
+
+    /** zIndex-1 */
+    underlay: () => <div />,
+  })
+
+  const MIN_WIDTH = 160
+  const bgRef = useRef()
+  const w = ref(0)
+  const h = ref(0)
+
+  const TRANSPARENT = 'rgba(255,255,255,0)'
+
+  const borderWidth = computed(() => w.value - (cornerWidth - 2) * 2 + fixSize)
+  const borderHeight = computed(() => h.value - (cornerHeight - 2) * 2)
+
+  const background = computed(() =>
+    [
+      // 上下内边框
+      insideBorder
+        ? `linear-gradient(to bottom, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 2}px ${borderPaddingY}px /${borderWidth.value}px`
+        : '',
+      insideBorder
+        ? `linear-gradient(to top, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 2}px -${borderPaddingY}px /${borderWidth.value}px`
+        : '',
+
+      // 左右外边框
+      `linear-gradient(to right, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
+      `linear-gradient(to left, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
+
+      // 左右内边框
+      insideBorder
+        ? `linear-gradient(to right, white 2px, ${TRANSPARENT} 2px) no-repeat ${borderPaddingX}px / 100% ${borderHeight.value}px`
+        : '',
+      insideBorder
+        ? `linear-gradient(to left, white 2px, ${TRANSPARENT} 2px) no-repeat -${borderPaddingX}px / 100% ${borderHeight.value}px`
+        : '',
+
+      // 上下外边框
+      `linear-gradient(to bottom, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
+      `linear-gradient(to top, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
+
+      // 背景色，在有边框前是为了 +4px 盖住浏览器渲染瑕疵
+      `linear-gradient(90.00deg, ${bgColor[0]}, ${bgColor[1]} 90%) no-repeat ${cornerWidth - 2}px 0 /${Math.ceil(w.value - cornerWidth * 2) + 4}px`,
+
+      `url(${bg.rt}) no-repeat right top`,
+      `url(${bg.rb}) no-repeat right bottom`,
+
+      `url(${bg.lt}) no-repeat`,
+      `url(${bg.lb}) no-repeat left bottom`,
+
+      // 背景色
+      `linear-gradient(to right, ${bgColor[0]}, ${bgColor[0]}) no-repeat 0 ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
+      `linear-gradient(90.00deg, ${bgColor[1]}, ${bgColor[1]}) no-repeat 100% ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
+    ]
+      .filter((item) => Boolean(item))
+      .join(','),
+  )
+
+  onMounted(() => {
+    w.value = bgRef?.value?.clientWidth ?? 0
+    h.value = bgRef?.value?.clientHeight ?? 0
+  })
+
+  const layoutClass = 'pos-absolute top-0 right-0 size-full pointer-events-none'
+
+  return (
+    <div class="pos-relative w-fit">
+      <div class={[layoutClass, 'z-4']}>
+        <slots.overlay />
+      </div>
+
+      <div
+        class="w-fit box-border"
+        ref={bgRef}
+        style={{
+          background: background.value,
+          padding: `0 ${cornerWidth}px`,
+          minHeight: `${minHeight}px`,
+          minWidth: `${MIN_WIDTH}px`,
+        }}
+      >
+        <div
+          class={[
+            'pos-relative z-3',
+            w.value === MIN_WIDTH ? 'flex justify-center' : '',
+            contentClass,
+          ]}
+        >
+          <slots.default />
+        </div>
+
+        <div class={[layoutClass, 'z-2']}>
+          <slots.decorator />
+        </div>
+        <div
+          v-if={bgPoint}
+          class="size-full bg-amber pos-absolute top-18px"
+          style={{
+            background: `url(${BgPoint})`,
+            width: `${w.value - cornerWidth * 2}px`,
+            height: `${h.value - 28}px`,
+          }}
+        ></div>
+      </div>
+
+      <div class={[layoutClass, 'z-1']}>
+        <slots.underlay />
+      </div>
+    </div>
+  )
 }
 
 /** 用户名组件 */
@@ -107,206 +260,54 @@ enum DmTypeEnum {
   GUARD,
 }
 
-interface DanmakuBaseProps {
-  sideWidth: number
-  cornerHeight: number
-  sideLeftBg: string
-  sideRightBg?: string
-  bgColor: string
-  sideLeftBgColor?: string
-  sideRightBgColor?: string
-  borderColor: string
-  borderWidth: number
-  paddingY: number
-  rightSideRotate?: string
-  insideBorder?: boolean
-  insideBorderPadding?: number
-  bgPoint?: boolean
-}
-
 interface DanmakuProps {
   data: Danmaku
   class?: string
 }
 
-const DanmakuBase = (props: DanmakuBaseProps) => {
-  const slots = defineSlots<{
-    default: () => any
-    belowTheBg: () => any
-    onTheText: () => any
-    belowTheText: () => any
-  }>()
-
-  const {
-    sideWidth,
-    cornerHeight,
-    sideLeftBg,
-    sideRightBg = sideLeftBg,
-    borderWidth,
-    borderColor,
-    bgColor,
-    sideLeftBgColor = bgColor,
-    sideRightBgColor = bgColor,
-    paddingY,
-    insideBorder,
-    insideBorderPadding,
-    bgPoint = false,
-  } = props
-
-  const Side = ({
-    bg,
-    bgColor,
-    isRight = false,
-  }: {
-    class?: string
-    bg: string
-    bgColor: string
-    isRight?: boolean
-  }) => {
-    const bgPos = isRight ? 'right' : 'left'
-
-    return (
-      <div
-        class="grid flex-shrink-0 pos-relative"
-        style={{
-          width: `${sideWidth}px`,
-          gridTemplateRows: `${cornerHeight}px 1fr ${cornerHeight}px`,
-        }}
-      >
-        <div style={{ background: `url(${bg}) no-repeat ${bgPos} top` }} />
-        <div
-          class="h-full"
-          style={{
-            [isRight ? 'borderRight' : 'borderLeft']: `${borderWidth}px solid`,
-            background: bgColor,
-            borderColor,
-          }}
-        >
-          <div
-            v-if={insideBorder}
-            class={[
-              'h-full b-solid b-0 b-#FFF',
-              isRight ? 'mr-4px' : 'ml-4px',
-              isRight ? 'b-r-2' : 'b-l-2',
-            ]}
-          />
-        </div>
-        <div
-          style={{
-            background: `url(${bg}) no-repeat ${bgPos} bottom`,
-          }}
-        />
-      </div>
-    )
-  }
-
-  // 装饰的白色横线
-  defineStyle(`
-    .line::before {
-      content:'';
-      display:block;
-      height: 2px;
-      width: 100%;
-      background: white;
-      position: absolute;
-      top: var(--lint-top);
-    }
-
-    .line::after {
-      content:'';
-      display:block;
-      height: 2px;
-      width: 100%;
-      background: white;
-      position: absolute;
-      bottom: var(--lint-top);
-    }
-  `)
-
-  return (
-    <div class="text-#3b3435 text-5 flex pos-relative">
-      <Side bg={sideLeftBg} bgColor={sideLeftBgColor} />
-
-      <div
-        class={[
-          'min-w-100px b-0 b-solid box-border pos-relative pointer-events-none',
-          insideBorder ? 'line' : '',
-        ]}
-        style={{
-          background: bgColor,
-          borderColor,
-          paddingTop: `${paddingY}px`,
-          paddingBottom: `${paddingY}px`,
-          borderWidth: `${borderWidth}px 0 ${borderWidth}px 0`,
-          '--lint-top': `${insideBorderPadding}px`,
-        }}
-      >
-        <slots.default v-if={slots.default} />
-      </div>
-
-      <Side bg={sideRightBg} bgColor={sideRightBgColor} isRight={true} />
-
-      {/* 背景的装饰点 */}
-      <div
-        class="pos-absolute left-0 right-0 top-0 bottom-0 z-1 py-8px px20px box-border pointer-events-none"
-        v-if={bgPoint}
-      >
-        <div style={{ background: `url(${BgPoint})` }} class="size-full" />
-      </div>
-
-      {/* 文字上面的装饰层 */}
-      <div class="pos-absolute z-2 size-full pointer-events-none">
-        <slots.onTheText v-if={slots.onTheText} />
-      </div>
-
-      {/* 背景下面的装饰层 */}
-      <div class="pos-absolute z--1 size-full pointer-events-none">
-        <slots.belowTheBg v-if={slots.belowTheBg} />
-      </div>
-
-      {/* 文字下的装饰层 */}
-      <div class="pointer-events-none">
-        <slots.belowTheText v-if={slots.belowTheText} />
-      </div>
-    </div>
-  )
-}
-
 const NormalDanmaku = ({ data }: DanmakuProps) => {
   return (
-    <DanmakuBase
-      sideLeftBg={NormalDmBg}
-      paddingY={10}
+    <BChatBubble
+      contentClass="py-4"
+      class="mt-10"
+      minHeight={58}
       borderColor="#C64336"
-      bgColor="#FFDE90"
-      sideWidth={26}
+      bgColor={['#FFDE90', '#FFDE90']}
       cornerHeight={29}
-      borderWidth={4}
+      cornerWidth={26}
+      insideBorder={false}
+      bgPoint={false}
+      bg={{
+        lt: NormalDmLTBg,
+        lb: NormalDmLBBg,
+        rt: NormalDmRTBg,
+        rb: NormalDmRBBg,
+      }}
     >
-      <DanmakuContentRender data={data}>
+      <DanmakuMessageRender data={data}>
         <div class="text-#3b3435 text-5">{data.message}</div>
-      </DanmakuContentRender>
-    </DanmakuBase>
+      </DanmakuMessageRender>
+    </BChatBubble>
   )
 }
 
 const ModeratorDanmaku = ({ data }: DanmakuProps) => {
   return (
-    <DanmakuBase
-      sideLeftBg={ModeratorDmBg}
-      paddingY={20}
+    <BChatBubble
+      contentClass="py-6.5"
+      class="box-border"
       borderColor="#932D23"
-      bgColor="#D7584B"
-      sideWidth={29}
-      cornerHeight={39}
-      borderWidth={4}
-      insideBorder={true}
-      insideBorderPadding={4}
-      bgPoint={true}
+      bgColor={['#D7584B', '#D7584B']}
+      borderPaddingY={8}
+      bg={{
+        lt: ModeratorDmLTBg,
+        lb: ModeratorDmLBBg,
+        rt: ModeratorDmRTBg,
+        rb: ModeratorDmRBBg,
+      }}
     >
-      <DanmakuContentRender data={data} />
-
-      <template v-slot:belowTheText>
+      <DanmakuMessageRender data={data} class="text-5" />
+      <template v-slot:decorator>
         <img
           src={ModeratorLeftFlower}
           class="ml-23px left-0 bottom--4px pos-absolute"
@@ -317,33 +318,28 @@ const ModeratorDanmaku = ({ data }: DanmakuProps) => {
         />
         <img src={ModeratorBow} class="pos-absolute right-6px mt--10px" />
       </template>
-    </DanmakuBase>
+    </BChatBubble>
   )
 }
 
 const GuardDanmaku = ({ data }: DanmakuProps) => {
   return (
-    <DanmakuBase
-      sideLeftBg={GuardDmBg}
-      paddingY={20}
+    <BChatBubble
+      contentClass="py-6.5"
       borderColor="#932D23"
-      bgColor="linear-gradient(90.00deg, rgba(195, 38, 38, 1),rgba(255, 213, 48, 1) 100%)"
-      sideWidth={29}
-      cornerHeight={39}
-      borderWidth={4}
-      insideBorder={true}
-      sideLeftBgColor="rgba(195, 38, 38, 1)"
-      sideRightBgColor="rgba(255, 213, 48, 1)"
-      insideBorderPadding={5}
-      bgPoint={true}
+      bgColor={['#C32626', '#FFD530']}
+      bg={{
+        lt: GuardDmLTBg,
+        lb: GuardDmLBBg,
+        rt: GuardDmRTBg,
+        rb: GuardDmRBBg,
+      }}
     >
-      <DanmakuContentRender data={data} />
-
-      <template v-slot:belowTheBg>
+      <DanmakuMessageRender data={data} class="text-5" />
+      <template v-slot:underlay>
         <img src={GuardBow} class="ml-[calc(100%-20px)]" />
       </template>
-
-      <template v-slot:onTheText>
+      <template v-slot:overlay>
         <div>
           <img
             src={GuardBowBead}
@@ -360,7 +356,7 @@ const GuardDanmaku = ({ data }: DanmakuProps) => {
           />
         </div>
       </template>
-    </DanmakuBase>
+    </BChatBubble>
   )
 }
 
@@ -577,105 +573,7 @@ const EnterItem = ({ data }: { data: Enter }) => {
   )
 }
 
-interface BChatBgProps {
-  bgColor: [string, string]
-  borderColor: string
-  borderPaddingY?: number
-  borderPaddingX?: number
-  insideBorder?: boolean
-  fixSize?: number
-  cornerHeight?: number
-  cornerWidth?: number
-  bg: {
-    lt: string
-    lb: string
-    rt: string
-    rb: string
-  }
-  class?: string
-}
-
-const BChatBg = ({
-  bgColor,
-  borderColor,
-  borderPaddingY = 9,
-  borderPaddingX = 8,
-  insideBorder = true,
-  fixSize = 2,
-  cornerHeight = 39,
-  cornerWidth = 29,
-  bg,
-}: BChatBgProps) => {
-  const slots = defineSlots({
-    default: () => <div />,
-  })
-
-  const bgRef = useRef()
-  const w = ref(0)
-  const h = ref(0)
-
-  const borderWidth = computed(() => w.value - (cornerWidth - 2) * 2 + fixSize)
-  const borderHeight = computed(() => h.value - (cornerHeight - 2) * 2)
-
-  onMounted(() => {
-    w.value = bgRef?.value?.clientWidth ?? 0
-    h.value = bgRef?.value?.clientHeight ?? 0
-  })
-
-  return (
-    <div
-      class="min-w-120px w-fit"
-      ref={bgRef}
-      style={{
-        background: [
-          `url(${bg.lt}) no-repeat`,
-          `url(${bg.lb}) no-repeat left bottom`,
-
-          // 上下内边框
-          insideBorder
-            ? `linear-gradient(to bottom, white 2px, #FFFFFF00 2px) no-repeat ${cornerWidth - 2}px ${borderPaddingY}px /${borderWidth.value}px`
-            : '',
-          insideBorder
-            ? `linear-gradient(to top, white 2px, #FFFFFF00 2px) no-repeat ${cornerWidth - 2}px -${borderPaddingY}px /${borderWidth.value}px`
-            : '',
-
-          // 左右外边框
-          `linear-gradient(to right, ${borderColor} 4px, #FFFFFF00 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
-          `linear-gradient(to left, ${borderColor} 4px, #FFFFFF00 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
-
-          // 左右内边框
-          insideBorder
-            ? `linear-gradient(to right, white 2px, #FFFFFF00 2px) no-repeat ${borderPaddingX}px / 100% ${borderHeight.value}px`
-            : '',
-          insideBorder
-            ? `linear-gradient(to left, white 2px, #FFFFFF00 2px) no-repeat -${borderPaddingX}px / 100% ${borderHeight.value}px`
-            : '',
-
-          // 上下外边框
-          `linear-gradient(to bottom, ${borderColor} 4px, #FFFFFF00 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
-          `linear-gradient(to top, ${borderColor} 4px, #FFFFFF00 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
-
-          // 背景色，在有边框前是为了+4px盖住浏览器渲染瑕疵
-          `linear-gradient(90.00deg, ${bgColor[0]}, ${bgColor[1]} 90%) no-repeat ${cornerWidth - 2}px 0 /${Math.ceil(w.value - cornerWidth * 2) + 4}px`,
-
-          `url(${bg.rt}) no-repeat right top`,
-          `url(${bg.rb}) no-repeat right bottom`,
-
-          // 背景色
-          `linear-gradient(to right, ${bgColor[0]}, ${bgColor[0]}) no-repeat 0 ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
-          `linear-gradient(90.00deg, ${bgColor[1]}, ${bgColor[1]}) no-repeat 100% ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
-        ]
-          .filter((item) => Boolean(item))
-          .join(','),
-      }}
-    >
-      <slots.default />
-    </div>
-  )
-}
-
 export const BChatItem = ({ data }: { data: AllEvent }) => {
-  // biome-ignore lint/correctness/noUnusedVariables: <>
   const Item = () => {
     switch (data.type) {
       case 'danmaku':
@@ -693,69 +591,9 @@ export const BChatItem = ({ data }: { data: AllEvent }) => {
     }
   }
 
-  // const borderColor = '#932D23'
-  // const bgColor: [string, string] = ['#C32626', '#FFD530']
-  // const fixSize = 2
-  // const cornerHeight = 39
-  // const cornerWidth = 29
-
-  // const borderPaddingY = 9
-  // const borderPaddingX = 8
-  // const insideBorder = true
-
-  // const bgLt = GuardDmLTBg
-  // const bgLb = GuardDmLBBg
-  // const bgRt = GuardDmRTBg
-  // const bgRb = GuardDmRBBg
-
   return (
     <div class="pt-30px">
-      <BChatBg
-        class="min-h-78px"
-        borderColor="#932D23"
-        bgColor={['#C32626', '#FFD530']}
-        bg={{
-          lt: GuardDmLTBg,
-          lb: GuardDmLBBg,
-          rt: GuardDmRTBg,
-          rb: GuardDmRBBg,
-        }}
-      >
-        `1`
-      </BChatBg>
-
-      <BChatBg
-        class="min-h-78px mt-10"
-        borderColor="#932D23"
-        bgColor={['#D7584B', '#D7584B']}
-        borderPaddingY={8}
-        bg={{
-          lt: ModeratorDmLTBg,
-          lb: ModeratorDmLBBg,
-          rt: ModeratorDmRTBg,
-          rb: ModeratorDmRBBg,
-        }}
-      >
-        12113213211211321321
-      </BChatBg>
-
-      <BChatBg
-        class="min-h-78px mt-10"
-        borderColor="#C64336"
-        bgColor={['#FFDE90', '#FFDE90']}
-        cornerHeight={29}
-        cornerWidth={26}
-        insideBorder={false}
-        bg={{
-          lt: NormalDmLTBg,
-          lb: NormalDmLBBg,
-          rt: NormalDmRTBg,
-          rb: NormalDmRBBg,
-        }}
-      >
-        12113213211211321321
-      </BChatBg>
-      {/* <Item /> */}
+      <Item />
     </div>
   )
 }
