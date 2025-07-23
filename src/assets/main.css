@@ -5,7 +5,7 @@
 
 body {
   font-family: '华文宋体 Black';
-  /* background: #000; */
+  background: #000;
 }
 
 .bchat-item {
@@ -24,4 +24,12 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.virt-list__client {
+  scroll-behavior: smooth;
+}
+
+.virt-list__client::-webkit-scrollbar {
+  display: none;
 }

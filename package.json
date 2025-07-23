@@ -22,7 +22,8 @@
     "nanoevents": "^9.1.0",
     "pinia": "^3.0.3",
     "vue": "^3.6.0-alpha.2",
-    "vue-jsx-vapor": "^2.5.2"
+    "vue-jsx-vapor": "^2.5.2",
+    "vue-virt-list": "^1.5.11"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.2",

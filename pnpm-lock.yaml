@@ -35,6 +35,9 @@ importers:
       vue-jsx-vapor:
         specifier: ^2.5.2
         version: 2.5.2(esbuild@0.25.6)(typescript@5.8.3)(vite@7.0.5(@types/node@24.0.14)(jiti@2.4.2)(yaml@2.8.0))(vue-tsc@3.0.2(typescript@5.8.3))(vue@3.6.0-alpha.2(typescript@5.8.3))
+      vue-virt-list:
+        specifier: ^1.5.11
+        version: 1.5.11(vue@3.6.0-alpha.2(typescript@5.8.3))
     devDependencies:
       '@biomejs/biome':
         specifier: 2.1.2
@@ -2136,6 +2139,17 @@ packages:
   vue-component-type-helpers@2.2.12:
     resolution: {integrity: sha512-YbGqHZ5/eW4SnkPNR44mKVc6ZKQoRs/Rux1sxC6rdwXb4qpbOSYfDr9DsTHolOTGmIKgM9j141mZbBeg05R1pw==}
 
+  vue-demi@0.14.10:
+    resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-flow-layout@0.1.1:
     resolution: {integrity: sha512-JdgRRUVrN0Y2GosA0M68DEbKlXMqJ7FQgsK8CjQD2vxvNSqAU6PZEpi4cfcTVtfM2GVOMjHo7GKKLbXxOBqDqA==}
     peerDependencies:
@@ -2170,6 +2184,15 @@ packages:
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
+
+  vue-virt-list@1.5.11:
+    resolution: {integrity: sha512-J/qTwnoH8HejblcCv8cZE3FL0NGUuYMpF6p3uW82iMRfFD8Gl/Yizg/VtX0M9/c/QZFoquptcemXcII+I1fMfQ==}
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^2.0.0 || >=3.0.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
 
   vue@3.5.17:
     resolution: {integrity: sha512-LbHV3xPN9BeljML+Xctq4lbz2lVHCR6DtbpTf5XIO6gugpXUN49j2QQPcMj086r9+AkJ0FfUT8xjulKKBkkr9g==}
@@ -4468,6 +4491,10 @@ snapshots:
 
   vue-component-type-helpers@2.2.12: {}
 
+  vue-demi@0.14.10(vue@3.6.0-alpha.2(typescript@5.8.3)):
+    dependencies:
+      vue: 3.6.0-alpha.2(typescript@5.8.3)
+
   vue-flow-layout@0.1.1(vue@3.6.0-alpha.2(typescript@5.8.3)):
     dependencies:
       vue: 3.6.0-alpha.2(typescript@5.8.3)
@@ -4501,6 +4528,11 @@ snapshots:
       '@volar/typescript': 2.4.19
       '@vue/language-core': 3.0.2(typescript@5.8.3)
       typescript: 5.8.3
+
+  vue-virt-list@1.5.11(vue@3.6.0-alpha.2(typescript@5.8.3)):
+    dependencies:
+      vue: 3.6.0-alpha.2(typescript@5.8.3)
+      vue-demi: 0.14.10(vue@3.6.0-alpha.2(typescript@5.8.3))
 
   vue@3.5.17(typescript@5.8.3):
     dependencies:

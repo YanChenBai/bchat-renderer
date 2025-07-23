@@ -12,7 +12,7 @@ export default defineConfig({
     vue(),
     vueJsxVapor({
       macros: true,
-      // interop: true,
+      interop: true,
     }),
     unocss(),
     vueDevTools(),

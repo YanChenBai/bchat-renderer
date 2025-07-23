@@ -1,3 +1,5 @@
+import { danmaku, gift, guard, superChat } from './huixing'
+
 export function useMockData<SC, DM, GUARD, GIFT>(mockData: {
   superChat: SC[]
   danmaku: DM[]
@@ -26,4 +28,13 @@ export function useMockData<SC, DM, GUARD, GIFT>(mockData: {
     getGift,
     getGuard,
   }
+}
+
+export function useMockHxData() {
+  return useMockData({
+    danmaku,
+    superChat,
+    guard,
+    gift,
+  } as const)
 }
