@@ -4,7 +4,6 @@ import { defineConfig, toEscapedSelector as e } from 'unocss'
 export default defineConfig({
   presets: [presetByc()],
   rules: [
-    [/^bg-y-(.+)$/, ([, c]) => ({ 'background-position-y': `${c}` })],
     [
       /^text-stroke-(.+)-(\d+)$/,
       ([, color, width], { rawSelector }) => {

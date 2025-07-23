@@ -39,38 +39,42 @@ import type {
   SuperChat,
 } from '@/utils/bchat-adapter'
 
-export const RenderText = ({ text }: { text: string; class?: string }) => {
-  return (
-    <div class="overflow-hidden text-white font-700 overflow-clip w-fit">
-      <div
-        v-for={(item, index) in text.split('')}
-        key={index}
-        class="text-stroke-#932D23-4 pos-relative inline-block"
-        data-text={item}
-      >
-        {item}
-      </div>
-    </div>
-  )
-}
-
-export const DanmakuMessageRender = ({ data }: { data: Danmaku }) => {
-  const slots = defineSlots({
-    default: (props: { data: Danmaku }) => (
-      <RenderText text={props.data.message} />
-    ),
-  })
-
-  if (data.dmType === 1) {
+export const RenderText = defineVaporComponent(
+  ({ text }: { text: string; class?: string }) => {
     return (
-      <div class="size-full flex justify-center items-center">
-        <img src={data.emojiUrl} class="w-45px text-center" />
+      <div class="overflow-hidden text-white font-700 overflow-clip w-fit">
+        <div
+          v-for={(item, index) in text.split('')}
+          key={index}
+          class="text-stroke-#932D23-4 pos-relative inline-block"
+          data-text={item}
+        >
+          {item}
+        </div>
       </div>
     )
-  } else {
-    return <slots.default data={data} />
-  }
-}
+  },
+)
+
+export const DanmakuMessageRender = defineVaporComponent(
+  ({ data }: { data: Danmaku }) => {
+    const slots = defineSlots({
+      default: (props: { data: Danmaku }) => (
+        <RenderText text={props.data.message} />
+      ),
+    })
+
+    if (data.dmType === 1) {
+      return (
+        <div class="size-full flex justify-center items-center">
+          <img src={data.emojiUrl} class="size-45px text-center" />
+        </div>
+      )
+    } else {
+      return <slots.default data={data} />
+    }
+  },
+)
 
 interface BChatBgProps {
   bgColor: [string, string]
@@ -93,166 +97,174 @@ interface BChatBgProps {
   }
 }
 
-const BChatBubble = ({
-  bgColor,
-  borderColor,
-  borderPaddingY = 9,
-  borderPaddingX = 8,
-  insideBorder = true,
-  fixSize = 2,
-  cornerHeight = 39,
-  cornerWidth = 29,
-  minHeight = 78,
-  bg,
-  contentClass,
-  bgPoint = true,
-}: BChatBgProps) => {
-  const slots = defineSlots({
-    /** zIndex-4 */
-    overlay: () => <div />,
+export const BChatBubble = defineVaporComponent(
+  ({
+    bgColor,
+    borderColor,
+    borderPaddingY = 8,
+    borderPaddingX = 8,
+    insideBorder = true,
+    fixSize = 2,
+    cornerHeight = 39,
+    cornerWidth = 29,
+    minHeight = 78,
+    bg,
+    contentClass,
+    bgPoint = true,
+  }: BChatBgProps) => {
+    const slots = defineSlots({
+      /** zIndex-4 */
+      overlay: () => <div />,
 
-    /** zIndex-3 */
-    default: () => <div />,
+      /** zIndex-3 */
+      default: () => <div />,
 
-    /** zIndex-2 */
-    decorator: () => <div />,
+      /** zIndex-2 */
+      decorator: () => <div />,
 
-    /** zIndex-1 */
-    underlay: () => <div />,
-  })
+      /** zIndex-1 */
+      underlay: () => <div />,
+    })
 
-  const MIN_WIDTH = 160
-  const bgRef = useRef()
-  const w = ref(0)
-  const h = ref(0)
+    const MIN_WIDTH = 160
+    const bgRef = useRef()
+    const w = ref(0)
+    const h = ref(0)
 
-  const TRANSPARENT = 'rgba(255,255,255,0)'
+    const TRANSPARENT = 'rgba(255,255,255,0)'
 
-  const borderWidth = computed(() => w.value - (cornerWidth - 2) * 2 + fixSize)
-  const borderHeight = computed(() => h.value - (cornerHeight - 2) * 2)
+    const borderWidth = computed(
+      () => w.value - (cornerWidth - 2) * 2 + fixSize,
+    )
+    const borderHeight = computed(() => h.value - (cornerHeight - 2) * 2)
 
-  const background = computed(() =>
-    [
-      // 上下内边框
-      insideBorder
-        ? `linear-gradient(to bottom, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 2}px ${borderPaddingY}px /${borderWidth.value}px`
-        : '',
-      insideBorder
-        ? `linear-gradient(to top, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 2}px -${borderPaddingY}px /${borderWidth.value}px`
-        : '',
+    const background = computed(() =>
+      [
+        // 上下内边框
+        insideBorder
+          ? `linear-gradient(to bottom, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 4}px ${borderPaddingY}px /${borderWidth.value + 2}px`
+          : '',
+        insideBorder
+          ? `linear-gradient(to top, white 2px, ${TRANSPARENT} 2px) no-repeat ${cornerWidth - 4}px -${borderPaddingY}px /${borderWidth.value + 2}px`
+          : '',
 
-      // 左右外边框
-      `linear-gradient(to right, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
-      `linear-gradient(to left, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 2}px  / 100% ${borderHeight.value}px`,
+        // 左右外边框
+        `linear-gradient(to right, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 3}px  / 100% ${borderHeight.value + 2}px`,
+        `linear-gradient(to left, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat 0px ${cornerHeight - 3}px  / 100% ${borderHeight.value + 2}px`,
 
-      // 左右内边框
-      insideBorder
-        ? `linear-gradient(to right, white 2px, ${TRANSPARENT} 2px) no-repeat ${borderPaddingX}px / 100% ${borderHeight.value}px`
-        : '',
-      insideBorder
-        ? `linear-gradient(to left, white 2px, ${TRANSPARENT} 2px) no-repeat -${borderPaddingX}px / 100% ${borderHeight.value}px`
-        : '',
+        // 左右内边框
+        insideBorder
+          ? `linear-gradient(to right, white 2px, ${TRANSPARENT} 2px) no-repeat ${borderPaddingX}px / 100% ${borderHeight.value}px`
+          : '',
+        insideBorder
+          ? `linear-gradient(to left, white 2px, ${TRANSPARENT} 2px) no-repeat -${borderPaddingX}px / 100% ${borderHeight.value}px`
+          : '',
 
-      // 上下外边框
-      `linear-gradient(to bottom, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
-      `linear-gradient(to top, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 2}px 0px /${borderWidth.value}px`,
+        // 上下外边框
+        `linear-gradient(to bottom, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 4}px 0px /${borderWidth.value + 2}px`,
+        `linear-gradient(to top, ${borderColor} 4px, ${TRANSPARENT} 4px) no-repeat ${cornerWidth - 4}px 0px /${borderWidth.value + 2}px`,
 
-      // 背景色，在有边框前是为了 +4px 盖住浏览器渲染瑕疵
-      `linear-gradient(90.00deg, ${bgColor[0]}, ${bgColor[1]} 90%) no-repeat ${cornerWidth - 2}px 0 /${Math.ceil(w.value - cornerWidth * 2) + 4}px`,
+        // 背景色，在有边框前是为了 +4px 盖住浏览器渲染瑕疵
+        `linear-gradient(90.00deg, ${bgColor[0]}, ${bgColor[1]} 90%) no-repeat ${cornerWidth - 2}px 0 /${Math.ceil(w.value - cornerWidth * 2) + 4}px`,
 
-      `url(${bg.rt}) no-repeat right top`,
-      `url(${bg.rb}) no-repeat right bottom`,
+        `url(${bg.rt}) no-repeat right top`,
+        `url(${bg.rb}) no-repeat right bottom`,
 
-      `url(${bg.lt}) no-repeat`,
-      `url(${bg.lb}) no-repeat left bottom`,
+        `url(${bg.lt}) no-repeat `,
+        `url(${bg.lb}) no-repeat left bottom`,
 
-      // 背景色
-      `linear-gradient(to right, ${bgColor[0]}, ${bgColor[0]}) no-repeat 0 ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
-      `linear-gradient(90.00deg, ${bgColor[1]}, ${bgColor[1]}) no-repeat 100% ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
-    ]
-      .filter((item) => Boolean(item))
-      .join(','),
-  )
+        // 背景色 - 覆盖多余的边角
+        `linear-gradient(to right, ${bgColor[0]}, ${bgColor[0]}) no-repeat 0 ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
+        `linear-gradient(90.00deg, ${bgColor[1]}, ${bgColor[1]}) no-repeat 100% ${cornerHeight - fixSize}px / ${cornerWidth}px ${borderHeight.value}px`,
+      ]
+        .filter((item) => Boolean(item))
+        .join(','),
+    )
 
-  onMounted(() => {
-    w.value = bgRef?.value?.clientWidth ?? 0
-    h.value = bgRef?.value?.clientHeight ?? 0
-  })
+    onMounted(() => {
+      w.value = bgRef?.value?.clientWidth ?? 0
+      h.value = bgRef?.value?.clientHeight ?? 0
+    })
 
-  const layoutClass = 'pos-absolute top-0 right-0 size-full pointer-events-none'
+    const layoutClass =
+      'pos-absolute top-0 right-0 size-full pointer-events-none'
 
-  return (
-    <div class="pos-relative w-fit">
-      <div class={[layoutClass, 'z-4']}>
-        <slots.overlay />
-      </div>
-
-      <div
-        class="w-fit box-border"
-        ref={bgRef}
-        style={{
-          background: background.value,
-          padding: `0 ${cornerWidth}px`,
-          minHeight: `${minHeight}px`,
-          minWidth: `${MIN_WIDTH}px`,
-        }}
-      >
-        <div
-          class={[
-            'pos-relative z-3',
-            w.value === MIN_WIDTH ? 'flex justify-center' : '',
-            contentClass,
-          ]}
-        >
-          <slots.default />
+    return (
+      <div class="pos-relative w-fit">
+        <div class={[layoutClass, 'z-4']}>
+          <slots.overlay />
         </div>
 
-        <div class={[layoutClass, 'z-2']}>
-          <slots.decorator />
-        </div>
         <div
-          v-if={bgPoint}
-          class="size-full bg-amber pos-absolute top-18px"
+          class="w-fit box-border"
+          ref={bgRef}
           style={{
-            background: `url(${BgPoint})`,
-            width: `${w.value - cornerWidth * 2}px`,
-            height: `${h.value - 28}px`,
+            background: background.value,
+            padding: `0 ${cornerWidth}px`,
+            minHeight: `${minHeight}px`,
+            minWidth: `${MIN_WIDTH}px`,
           }}
-        ></div>
-      </div>
+        >
+          <div
+            class={[
+              'pos-relative z-3',
+              w.value === MIN_WIDTH ? 'flex justify-center' : '',
+              contentClass,
+            ]}
+          >
+            <slots.default />
+          </div>
 
-      <div class={[layoutClass, 'z-1']}>
-        <slots.underlay />
+          <div class={[layoutClass, 'z-2']}>
+            <slots.decorator />
+          </div>
+
+          <div
+            v-if={bgPoint}
+            class="size-full bg-amber pos-absolute top-18px"
+            style={{
+              background: `url(${BgPoint})`,
+              width: `${w.value - cornerWidth * 2}px`,
+              height: `${h.value - 28}px`,
+            }}
+          ></div>
+        </div>
+
+        <div class={[layoutClass, 'z-1']}>
+          <slots.underlay />
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  },
+)
 
 /** 用户名组件 */
-const UserName = ({
-  name,
-  bgColor = '#FFD46C',
-  textColor = '#3B3435',
-  showFlower = false,
-}: {
-  name: string
-  bgColor?: string
-  textColor?: string
-  class?: string
-  showFlower?: boolean
-}) => {
-  return (
-    <div class="pos-relative z-3 flex">
-      <div
-        class="rd-full text-4 px4 b-#932D23 b-solid b-3px w-fit text-center"
-        style={{ background: bgColor, color: textColor }}
-      >
-        {name}
+const UserName = defineVaporComponent(
+  ({
+    name,
+    bgColor = '#FFD46C',
+    textColor = '#3B3435',
+    showFlower = false,
+  }: {
+    name: string
+    bgColor?: string
+    textColor?: string
+    class?: string
+    showFlower?: boolean
+  }) => {
+    return (
+      <div class="pos-relative z-3 flex">
+        <div
+          class="rd-full text-4 px4 b-#932D23 b-solid b-3px w-fit text-center"
+          style={{ background: bgColor, color: textColor }}
+        >
+          {name}
+        </div>
+        <img v-if={showFlower} src={GuardMidFlower} class="ml-15px" />
       </div>
-      <img v-if={showFlower} src={GuardMidFlower} class="ml-15px" />
-    </div>
-  )
-}
+    )
+  },
+)
 
 enum DmTypeEnum {
   NORMAL,
@@ -265,7 +277,7 @@ interface DanmakuProps {
   class?: string
 }
 
-const NormalDanmaku = ({ data }: DanmakuProps) => {
+const NormalDanmaku = defineVaporComponent(({ data }: DanmakuProps) => {
   return (
     <BChatBubble
       contentClass="py-4"
@@ -289,16 +301,15 @@ const NormalDanmaku = ({ data }: DanmakuProps) => {
       </DanmakuMessageRender>
     </BChatBubble>
   )
-}
+})
 
-const ModeratorDanmaku = ({ data }: DanmakuProps) => {
+const ModeratorDanmaku = defineVaporComponent(({ data }: DanmakuProps) => {
   return (
     <BChatBubble
       contentClass="py-6.5"
       class="box-border"
       borderColor="#932D23"
       bgColor={['#D7584B', '#D7584B']}
-      borderPaddingY={8}
       bg={{
         lt: ModeratorDmLTBg,
         lb: ModeratorDmLBBg,
@@ -320,9 +331,9 @@ const ModeratorDanmaku = ({ data }: DanmakuProps) => {
       </template>
     </BChatBubble>
   )
-}
+})
 
-const GuardDanmaku = ({ data }: DanmakuProps) => {
+const GuardDanmaku = defineVaporComponent(({ data }: DanmakuProps) => {
   return (
     <BChatBubble
       contentClass="py-6.5"
@@ -358,41 +369,43 @@ const GuardDanmaku = ({ data }: DanmakuProps) => {
       </template>
     </BChatBubble>
   )
-}
+})
 
-const DmUserFace = ({ url, type }: { url: string; type: DmTypeEnum }) => {
-  if (type === DmTypeEnum.NORMAL) {
+const DmUserFace = defineVaporComponent(
+  ({ url, type }: { url: string; type: DmTypeEnum }) => {
+    if (type === DmTypeEnum.NORMAL) {
+      return (
+        <img src={url} class="size-80px rounded-full b-solid b-4px b-#D7584B" />
+      )
+    }
+
     return (
-      <img src={url} class="size-80px rounded-full b-solid b-4px b-#D7584B" />
+      <div>
+        <img
+          v-if={type === DmTypeEnum.GUARD}
+          src={url}
+          alt="User Face"
+          class="rd-full size-76px mt-20px ml-8px"
+        />
+        <img
+          v-else
+          src={url}
+          alt="User Face"
+          class="rd-full size-76px mt-18px ml-5px"
+        />
+        <img
+          src={
+            type === DmTypeEnum.GUARD ? GuardDmFaceFrame : ModeratorDmFaceFrame
+          }
+          width="100%"
+          class="pos-absolute left-0"
+        />
+      </div>
     )
-  }
+  },
+)
 
-  return (
-    <div>
-      <img
-        v-if={type === DmTypeEnum.GUARD}
-        src={url}
-        alt="User Face"
-        class="rd-full size-76px mt-20px ml-8px"
-      />
-      <img
-        v-else
-        src={url}
-        alt="User Face"
-        class="rd-full size-76px mt-18px ml-5px"
-      />
-      <img
-        src={
-          type === DmTypeEnum.GUARD ? GuardDmFaceFrame : ModeratorDmFaceFrame
-        }
-        width="100%"
-        class="pos-absolute left-0"
-      />
-    </div>
-  )
-}
-
-const DanmakuItem = ({ data }: DanmakuProps) => {
+const DanmakuItem = defineVaporComponent(({ data }: DanmakuProps) => {
   let userType: DmTypeEnum
 
   if (data.isModerator) {
@@ -448,46 +461,48 @@ const DanmakuItem = ({ data }: DanmakuProps) => {
       </div>
     </div>
   )
-}
+})
 
 /** 大弹幕 (礼物, SC) 的头像组件 */
-const BigChatUserFace = ({
-  url,
-  flower,
-  frame = FaceFrame1,
-  flowerPos,
-}: {
-  url: string
-  flower: string
-  frame?: string
-  flowerPos?: {
-    x?: number
-    y?: number
-  }
-}) => {
-  return (
-    <div class="w-full pos-relative h-102px">
-      <div class="w-92px m-a pos-relative">
-        <img src={frame} alt="Gift Frame" class="pos-relative z-1" />
-        <img
-          src={flower}
-          alt="Gift User Frame"
-          class="pos-absolute z-2 top-0 left-0"
-          style={{
-            transform: `translate(${flowerPos?.x ?? 0}px, ${flowerPos?.y ?? 0}px)`,
-          }}
-        />
-        <img
-          src={url}
-          alt="Gift User Face"
-          class="size-80px pos-absolute left-6px bottom-10px rd-full z-0"
-        />
+const BigChatUserFace = defineVaporComponent(
+  ({
+    url,
+    flower,
+    frame = FaceFrame1,
+    flowerPos,
+  }: {
+    url: string
+    flower: string
+    frame?: string
+    flowerPos?: {
+      x?: number
+      y?: number
+    }
+  }) => {
+    return (
+      <div class="w-full pos-relative h-102px">
+        <div class="w-92px m-a pos-relative">
+          <img src={frame} alt="Gift Frame" class="pos-relative z-1" />
+          <img
+            src={flower}
+            alt="Gift User Frame"
+            class="pos-absolute z-2 top-0 left-0"
+            style={{
+              transform: `translate(${flowerPos?.x ?? 0}px, ${flowerPos?.y ?? 0}px)`,
+            }}
+          />
+          <img
+            src={url}
+            alt="Gift User Face"
+            class="size-80px pos-absolute left-6px bottom-10px rd-full z-0"
+          />
+        </div>
       </div>
-    </div>
-  )
-}
+    )
+  },
+)
 
-const SuperChatItem = ({ data }: { data: SuperChat }) => {
+const SuperChatItem = defineVaporComponent(({ data }: { data: SuperChat }) => {
   return (
     <div class="h-352px flex flex-col">
       <div
@@ -512,9 +527,9 @@ const SuperChatItem = ({ data }: { data: SuperChat }) => {
       </div>
     </div>
   )
-}
+})
 
-const GiftItem = ({ data }: { data: Gift }) => {
+const GiftItem = defineVaporComponent(({ data }: { data: Gift }) => {
   const giftDesc = `赠送了 ${data.giftName}\u00d7${data.giftNum}`
   return (
     <div class="h-318px">
@@ -539,9 +554,9 @@ const GiftItem = ({ data }: { data: Gift }) => {
       </div>
     </div>
   )
-}
+})
 
-const GuardItem = ({ data }: { data: Guard }) => {
+const GuardItem = defineVaporComponent(({ data }: { data: Guard }) => {
   return (
     <div class="w-full pos-relative">
       <img
@@ -555,45 +570,17 @@ const GuardItem = ({ data }: { data: Guard }) => {
       <img src={GuardBg} alt="Grand" width="100%" class="pos-relative z-2" />
     </div>
   )
-}
+})
 
-const LikeItem = ({ data }: { data: Like }) => {
-  return (
-    <div>
-      {data.uname}-{'>'} {data.likeText}
-    </div>
-  )
-}
-
-const EnterItem = ({ data }: { data: Enter }) => {
-  return (
-    <div>
-      {data.uname}-{'>'} 进入房间
-    </div>
-  )
-}
-
-export const BChatItem = ({ data }: { data: AllEvent }) => {
-  const Item = () => {
-    switch (data.type) {
-      case 'danmaku':
-        return <DanmakuItem data={data} />
-      case 'superChat':
-        return <SuperChatItem data={data} />
-      case 'gift':
-        return <GiftItem data={data} />
-      case 'guard':
-        return <GuardItem data={data} />
-      case 'like':
-        return <LikeItem data={data} />
-      case 'enter':
-        return <EnterItem data={data} />
-    }
-  }
-
-  return (
-    <div class="pt-30px">
-      <Item />
-    </div>
-  )
-}
+export const BChatItem = defineVaporComponent(
+  ({ data }: { data: AllEvent }) => {
+    return (
+      <div class="pt-30px">
+        <DanmakuItem v-if={data.type === 'danmaku'} data={data} />
+        <SuperChatItem v-else-if={data.type === 'superChat'} data={data} />
+        <GiftItem v-else-if={data.type === 'gift'} data={data} />
+        <GuardItem v-else-if={data.type === 'guard'} data={data} />
+      </div>
+    )
+  },
+)

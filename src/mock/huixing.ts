@@ -1,4 +1,5 @@
 import type { HxDM, HxGift, HxGuard, HxSuperChat } from '@/types/huixing'
+import { useMockData } from '.'
 
 export const danmaku: HxDM[] = [
   {
@@ -355,4 +356,8 @@ export const HuiXingMockData = {
   danmaku,
   guard,
   gift,
+}
+
+export const useMockHxData = () => {
+  return useMockData(HuiXingMockData)
 }

@@ -13,6 +13,7 @@ declare global {
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const defineStyle: typeof import('vue-jsx-vapor')['defineStyle']
+  const defineVaporComponent: typeof import('vue')['defineVaporComponent']
   const effectScope: typeof import('vue')['effectScope']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
