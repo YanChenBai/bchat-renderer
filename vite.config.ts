@@ -4,7 +4,7 @@ import unocss from 'unocss/vite'
 import autoImport from 'unplugin-auto-import/vite'
 import { defineConfig } from 'vite'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
-import vueDevTools from 'vite-plugin-vue-devtools'
+// import vueDevTools from 'vite-plugin-vue-devtools'
 import vueJsxVapor from 'vue-jsx-vapor/vite'
 
 // https://vite.dev/config/
@@ -16,7 +16,6 @@ export default defineConfig({
       interop: true,
     }),
     unocss(),
-    vueDevTools(),
     autoImport({
       imports: [
         'vue',
@@ -27,7 +26,7 @@ export default defineConfig({
             'useProps',
             'defineStyle',
           ],
-          vue: ['defineVaporComponent'],
+          vue: ['defineVaporComponent', 'defineComponent'],
         },
       ],
       dirs: ['./src/hooks'],

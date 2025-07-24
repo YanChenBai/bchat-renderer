@@ -1,29 +1,38 @@
 import { BChatItem } from './components/BChatItem'
-import { BChatRenderer } from './components/BChatRenderer'
-import { useMockHxData } from './mock/huixing'
-import { type AllEvent, HuiXingBChatListener } from './utils/bchat-adapter'
+import { BChatRenderer, pushData } from './components/BChatRenderer'
+import { HuiXingMockData, useMockHxData } from './mock/huixing'
+import { HuiXingBChatListener } from './utils/bchat-adapter'
 
 export default defineVaporComponent(() => {
-  const bchat = useRef()
-
   const bcl = new HuiXingBChatListener()
 
   bcl.emitter.batchSubscribe(
     ['dm', 'gift', 'superChat', 'guard', 'enter', 'like'],
-    (_, data) => bchat.value?.add(data),
+    (_, data) => pushData(data),
   )
 
+  // 开发模式下才运行
   if (import.meta.env.DEV) {
     const { getMockData } = useMockHxData()
 
+    setTimeout(() => {
+      bcl.handleDanmaku(HuiXingMockData.danmaku[0])
+      bcl.handleGift(HuiXingMockData.gift[0])
+      bcl.handleSuperChat(HuiXingMockData.superChat[0])
+      bcl.handleGuard(HuiXingMockData.guard[0])
+    }, 1)
+
     setInterval(() => {
-      bchat.value?.add(getMockData() as any)
+      bcl.handleDanmaku(HuiXingMockData.danmaku[0])
+      bcl.handleGift(HuiXingMockData.gift[0])
+      bcl.handleSuperChat(HuiXingMockData.superChat[0])
+      bcl.handleGuard(HuiXingMockData.guard[0])
     }, 1000)
   }
 
   return (
     <div class="w-590px h-screen overflow-hidden">
-      <BChatRenderer<AllEvent> v-slot={{ item }} ref={bchat}>
+      <BChatRenderer v-slot={{ item }}>
         <BChatItem data={item} />
       </BChatRenderer>
     </div>

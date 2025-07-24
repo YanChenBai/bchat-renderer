@@ -32,10 +32,8 @@ import ScFrameFlower from '@/assets/chat-ui/sc-frame-flower.png'
 import type {
   AllEvent,
   Danmaku,
-  Enter,
   Gift,
   Guard,
-  Like,
   SuperChat,
 } from '@/utils/bchat-adapter'
 
@@ -558,13 +556,13 @@ const GiftItem = defineVaporComponent(({ data }: { data: Gift }) => {
 
 const GuardItem = defineVaporComponent(({ data }: { data: Guard }) => {
   return (
-    <div class="w-full pos-relative">
+    <div class="w-full h-280px pos-relative">
       <img
         src={data.face}
         alt="User Face"
         class="pos-absolute size-80px rd-full mt-24px ml-348px z-1"
       />
-      <div class="pos-absolute top-80.5% left-0 text-4 pl-21% pr-27% text-white w-full text-center z-3 box-border">
+      <div class="pos-absolute top-232px left-0 text-4 pl-21% pr-27% text-white w-full text-center z-3 box-border">
         {data.uname}
       </div>
       <img src={GuardBg} alt="Grand" width="100%" class="pos-relative z-2" />

@@ -11,7 +11,6 @@ body {
 .bchat-item {
   width: 100%;
   animation: 0.3s linear enter-anim;
-  animation: 0.3s linear enter-anim;
 }
 
 @keyframes enter-anim {

@@ -1,127 +1,140 @@
+import { Volt } from '@byc/volt'
+import type { AllEvent } from '@/utils/bchat-adapter'
+
+const emitter = new Volt<{ add: AllEvent }>()
+
+export const pushData = (data: AllEvent) => emitter.emit('add', data)
+
 const toFixed = (num: number, length: number) => Number(num.toFixed(length))
 
-export const BChatRenderer = defineVaporComponent(
-  <T extends { id: string }>() => {
-    const slots = defineSlots<{
-      default: (props: { item: T }) => any
-    }>()
+export const BChatRenderer = defineVaporComponent(() => {
+  const slots = defineSlots({
+    default: (props: { item: AllEvent }) => <div id={props.item.id} />,
+  })
 
-    const Item = slots.default
+  const BCHAT_ITEM_CLASS = 'bchat-item'
 
-    if (!Item) throw new Error('default slot is not defined')
+  const bchatWrap = useRef()
+  const bchatContent = useRef()
 
-    const BCHAT_ITEM_CLASS = 'bchat-item'
+  const offset = ref(0)
 
-    const bchatWrap = useRef()
-    const bchatContent = useRef()
+  const buffer: AllEvent[] = []
+  const renderQueue = ref<AllEvent[]>([]) as Ref<AllEvent[]>
 
-    const offset = ref(0)
+  let speed = 0
+  let targetSpeed = 0
 
-    const buffer: T[] = []
-    const renderQueue = ref<T[]>([]) as Ref<T[]>
+  let frameCount = 0
+  let containerHeight = 0
+  const RECYCLE_INTERVAL = 30
 
-    let speed = 0
-    let targetSpeed = 0
+  const heightCache = new WeakMap<HTMLElement, number>()
 
-    let frameCount = 0
-    let containerHeight = 0
-    const RECYCLE_INTERVAL = 30
-
-    function loopMoveBuffer() {
-      if (buffer.length > 0) {
-        const count = Math.min(2, buffer.length) // 每次最多取 2 条
-        renderQueue.value.push(...buffer.splice(0, count))
-      }
-
-      setTimeout(loopMoveBuffer, 200)
+  function loopMoveBuffer() {
+    if (buffer.length > 0) {
+      const count = Math.min(4, buffer.length)
+      renderQueue.value.push(...buffer.splice(0, count))
     }
 
-    const add = (item: T) => buffer.push(item)
+    setTimeout(loopMoveBuffer, 200)
+  }
 
-    const updateTargetSpeed = () => {
-      targetSpeed = toFixed(Math.max(1, renderQueue.value.length * 0.6), 2)
-    }
+  const updateTargetSpeed = () => {
+    targetSpeed = toFixed(Math.max(1, renderQueue.value.length * 0.6), 2)
+  }
 
-    async function tick() {
-      const next = () => requestAnimationFrame(tick)
+  async function tick() {
+    const next = () => requestAnimationFrame(tick)
 
-      frameCount++
-      const contentEl = bchatContent.value
+    frameCount++
+    const contentEl = bchatContent.value
 
-      if (!contentEl) return next()
+    if (!contentEl) return next()
 
-      const contentHeight = contentEl.clientHeight
+    const contentHeight = contentEl.clientHeight
 
-      const scrollVal = Math.max(0, contentHeight - containerHeight)
+    const scrollVal = Math.max(0, contentHeight - containerHeight)
 
-      /**
-       * 用 offset.value / containerHeight > 1 来判断是否溢出的原因
-       * 应为一旦超出就会被回收
-       */
-      const isOverflow =
-        offset.value <= 0 ? false : offset.value / containerHeight > 2
+    /**
+     * 用 offset.value / containerHeight > 1 来判断是否溢出的原因
+     * 应为一旦超出就会被回收
+     */
+    const isOverflow =
+      offset.value <= 0 ? false : offset.value / containerHeight > 2
 
-      if (isOverflow && frameCount % RECYCLE_INTERVAL === 0) {
-        const items = contentEl.querySelectorAll<HTMLDivElement>(
-          `.${BCHAT_ITEM_CLASS}`,
-        )
+    if (isOverflow && frameCount % RECYCLE_INTERVAL === 0) {
+      const items = contentEl.querySelectorAll<HTMLDivElement>(
+        `.${BCHAT_ITEM_CLASS}`,
+      )
 
-        frameCount = 0
+      frameCount = 0
 
-        let heightTotal = 0
-        let removedTotal = 0
+      let heightTotal = 0
+      let removedTotal = 0
 
-        for (const item of items) {
-          const val = heightTotal + item.clientHeight
+      for (const item of items) {
+        let itemHeight = 0
 
-          if (offset.value <= val) break
-
-          heightTotal = val
-          removedTotal++
+        if (heightCache.has(item)) {
+          itemHeight = heightCache.get(item)!
+        } else {
+          itemHeight = item.clientHeight
+          heightCache.set(item, itemHeight)
         }
 
-        if (removedTotal <= 0) return next()
+        const val = heightTotal + item.clientHeight
 
-        renderQueue.value.splice(0, removedTotal)
+        if (offset.value <= val) break
 
-        offset.value -= heightTotal
-      } else {
-        speed = Math.min(speed + (targetSpeed - speed) * 0.1, targetSpeed)
-
-        offset.value = Math.min(scrollVal, offset.value + speed)
+        heightTotal = val
+        removedTotal++
       }
-      next()
+
+      if (removedTotal <= 0) return next()
+
+      renderQueue.value.splice(0, removedTotal)
+
+      offset.value -= heightTotal
+    } else {
+      speed = Math.min(speed + (targetSpeed - speed) * 0.1, targetSpeed)
+
+      offset.value = Math.min(scrollVal, offset.value + speed)
     }
+    next()
+  }
 
-    onMounted(() => {
-      setInterval(updateTargetSpeed, 200)
-      loopMoveBuffer()
-      containerHeight = bchatWrap.value?.clientHeight ?? 0
-      tick()
-    })
+  emitter.on('add', (item) => {
+    buffer.push(item)
+  })
 
-    defineExpose({
-      add,
-    })
+  onMounted(() => {
+    setInterval(updateTargetSpeed, 200)
+    loopMoveBuffer()
+    containerHeight = bchatWrap.value?.clientHeight ?? 0
+    tick()
+  })
 
-    return (
-      <div class="size-full overflow-hidden" ref={bchatWrap}>
+  return (
+    <div class="size-full overflow-hidden" ref={bchatWrap}>
+      <div
+        ref={bchatContent}
+        style={{
+          transform: `translate3d(0, -${offset.value}px, 0)`,
+          willChange: 'transform',
+        }}
+      >
         <div
-          ref={bchatContent}
+          v-for={item in renderQueue.value}
+          // key={item.id}
+          class={BCHAT_ITEM_CLASS}
           style={{
-            transform: `translateY(-${offset.value}px)`,
-            willChange: 'transform',
+            contain: 'layout style paint',
           }}
         >
-          <div
-            v-for={item in renderQueue.value}
-            key={item.id}
-            class={BCHAT_ITEM_CLASS}
-          >
-            <Item item={item} />
-          </div>
+          <slots.default item={item} />
         </div>
       </div>
-    )
-  },
-)
+    </div>
+  )
+})
