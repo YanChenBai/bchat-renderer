@@ -12,6 +12,8 @@ export const BChatRenderer = defineVaporComponent(() => {
     default: (props: { item: AllEvent }) => <div id={props.item.id} />,
   })
 
+  const MIN_HEIGHT = 60
+
   const BCHAT_ITEM_CLASS = 'bchat-item'
 
   const bchatWrap = useRef()
@@ -26,7 +28,7 @@ export const BChatRenderer = defineVaporComponent(() => {
   let targetSpeed = 0
 
   let frameCount = 0
-  let containerHeight = 0
+  let wrapHeight = 0
   const RECYCLE_INTERVAL = 30
 
   const heightCache = new WeakMap<HTMLElement, number>()
@@ -54,14 +56,13 @@ export const BChatRenderer = defineVaporComponent(() => {
 
     const contentHeight = contentEl.clientHeight
 
-    const scrollVal = Math.max(0, contentHeight - containerHeight)
+    const scrollVal = Math.max(0, contentHeight - wrapHeight)
 
     /**
-     * 用 offset.value / containerHeight > 1 来判断是否溢出的原因
+     * 用 offset.value / wrapHeight > 1 来判断是否溢出的原因
      * 应为一旦超出就会被回收
      */
-    const isOverflow =
-      offset.value <= 0 ? false : offset.value / containerHeight > 2
+    const isOverflow = offset.value <= 0 ? false : offset.value / wrapHeight > 2
 
     if (isOverflow && frameCount % RECYCLE_INTERVAL === 0) {
       const items = contentEl.querySelectorAll<HTMLDivElement>(
@@ -91,7 +92,7 @@ export const BChatRenderer = defineVaporComponent(() => {
         removedTotal++
       }
 
-      if (removedTotal <= 0) return next()
+      if (removedTotal <= Math.ceil(wrapHeight / MIN_HEIGHT)) return next()
 
       renderQueue.value.splice(0, removedTotal)
 
@@ -111,7 +112,7 @@ export const BChatRenderer = defineVaporComponent(() => {
   onMounted(() => {
     setInterval(updateTargetSpeed, 200)
     loopMoveBuffer()
-    containerHeight = bchatWrap.value?.clientHeight ?? 0
+    wrapHeight = bchatWrap.value?.clientHeight ?? 0
     tick()
   })
 
@@ -126,7 +127,6 @@ export const BChatRenderer = defineVaporComponent(() => {
       >
         <div
           v-for={item in renderQueue.value}
-          // key={item.id}
           class={BCHAT_ITEM_CLASS}
           style={{
             contain: 'layout style paint',
