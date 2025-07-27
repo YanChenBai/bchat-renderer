@@ -574,10 +574,14 @@ export const BChatItem = defineVaporComponent(
   ({ data }: { data: AllEvent }) => {
     return (
       <div class="pt-30px">
-        <DanmakuItem v-if={data.type === 'danmaku'} data={data} />
-        <SuperChatItem v-else-if={data.type === 'superChat'} data={data} />
-        <GiftItem v-else-if={data.type === 'gift'} data={data} />
-        <GuardItem v-else-if={data.type === 'guard'} data={data} />
+        <DanmakuItem v-once v-if={data.type === 'danmaku'} data={data} />
+        <SuperChatItem
+          v-once
+          v-else-if={data.type === 'superChat'}
+          data={data}
+        />
+        <GiftItem v-once v-else-if={data.type === 'gift'} data={data} />
+        <GuardItem v-once v-else-if={data.type === 'guard'} data={data} />
       </div>
     )
   },

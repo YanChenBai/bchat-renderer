@@ -425,6 +425,7 @@ export class HuiXingBChatListener extends BChatListener {
 
         if (category !== 'event') return
         if (!this.allowedMessages.includes(type)) return
+        // console.log(data)
 
         switch (type) {
           case HxCmd.DM:

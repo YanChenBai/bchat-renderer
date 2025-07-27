@@ -1,6 +1,6 @@
 import { BChatItem } from './components/BChatItem'
 import { BChatRenderer, pushData } from './components/BChatRenderer'
-import { HuiXingMockData } from './mock/huixing'
+import { HuiXingMockData, useMockHxData } from './mock/huixing'
 import { HuiXingBChatListener } from './utils/bchat-adapter'
 
 export default defineVaporComponent(() => {
@@ -13,19 +13,17 @@ export default defineVaporComponent(() => {
 
   // 开发模式下才运行
   if (import.meta.env.DEV) {
+    const { getMockData } = useMockHxData()
     setTimeout(() => {
-      bcl.handleDanmaku(HuiXingMockData.danmaku[0])
-      bcl.handleGift(HuiXingMockData.gift[0])
-      bcl.handleSuperChat(HuiXingMockData.superChat[0])
-      bcl.handleGuard(HuiXingMockData.guard[0])
-    }, 1)
-
-    setInterval(() => {
-      bcl.handleDanmaku(HuiXingMockData.danmaku[0])
+      // bcl.handleDanmaku(HuiXingMockData.danmaku[0])
       // bcl.handleGift(HuiXingMockData.gift[0])
       // bcl.handleSuperChat(HuiXingMockData.superChat[0])
       // bcl.handleGuard(HuiXingMockData.guard[0])
-    }, 100)
+    }, 1)
+
+    setInterval(() => {
+      pushData(getMockData() as any)
+    }, 300)
   }
 
   return (

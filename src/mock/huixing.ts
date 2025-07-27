@@ -1,4 +1,5 @@
 import type { HxDM, HxGift, HxGuard, HxSuperChat } from '@/types/huixing'
+import { HuiXingBChatEventAdapter } from '@/utils/bchat-adapter'
 import { useMockData } from '.'
 
 export const danmaku: HxDM[] = [
@@ -359,5 +360,5 @@ export const HuiXingMockData = {
 }
 
 export const useMockHxData = () => {
-  return useMockData(HuiXingMockData)
+  return useMockData(HuiXingMockData, new HuiXingBChatEventAdapter())
 }
